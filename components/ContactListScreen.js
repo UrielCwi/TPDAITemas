@@ -1,10 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, Alert } from 'react-native';
 import * as Contacts from 'expo-contacts';
+import * as SecureStore from 'expo-secure-store';
 
-const ContactListScreen = () => {
+const ContactListScreen = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);
-  const [permissionStatus, setPermissionStatus] = useState(null);
+  const [emergencyNumbers, setEmergencyNumbers] = useState([]);
+
+  useEffect(() => {
+    fetchEmergencyNumbers();
+  }, []);
+
+  const fetchEmergencyNumbers = async () => {
+    try {
+      const storedNumbers = await SecureStore.getItemAsync('emergencyNumbers');
+      if (storedNumbers) {
+        setEmergencyNumbers(JSON.parse(storedNumbers));
+      }
+    } catch (error) {
+      console.error('Error fetching emergency numbers:', error);
+    }
+  };
 
   const loadContacts = async () => {
     const { status } = await Contacts.requestPermissionsAsync();
@@ -12,41 +28,42 @@ const ContactListScreen = () => {
       const { data } = await Contacts.getContactsAsync();
       if (data.length > 0) {
         setContacts(data);
+        fetchEmergencyNumbers(); // Refresh emergency numbers when contacts are loaded
+      } else {
+        Alert.alert('No Contacts Found', 'No contacts were found on this device.');
       }
+    } else {
+      Alert.alert('Permission Denied', 'We need permission to access your contacts.');
     }
-    setPermissionStatus(status);
   };
 
-  useEffect(() => {
-    loadContacts();
-  }, []);
+  const formatPhoneNumber = (number) => {
+    return number.replace(/\D/g, '');
+  };
+
+  const renderItem = ({ item }) => {
+    const formattedNumber = item.phoneNumbers ? formatPhoneNumber(item.phoneNumbers[0].number) : '';
+    const isEmergency = emergencyNumbers.some(emergencyNumber => formattedNumber === formatPhoneNumber(emergencyNumber));
+
+    return (
+      <View style={styles.contactItem}>
+        <Text style={styles.contactName}>
+          {item.firstName} {item.lastName}
+        </Text>
+        <Text style={[styles.contactNumber, isEmergency && styles.emergencyNumber]}>
+          {formattedNumber || 'No Phone Number'}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {permissionStatus === 'granted' ? (
         <FlatList
-          data={contacts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.contactItem}>
-              <Text style={styles.contactName}>
-                {item.firstName} {item.lastName}
-              </Text>
-              {item.phoneNumbers && item.phoneNumbers.length > 0 ? (
-                <Text style={styles.contactNumber}>{item.phoneNumbers[0].number}</Text>
-              ) : (
-                <Text style={styles.noNumber}>No hay numero de telefono</Text>
-              )}
-            </View>
-          )}
-        />
-      ) : (
-        <Text style={styles.permissionText}>
-          {permissionStatus === 'undetermined'
-            ? 'Permiso para acceder a contactos no concedido.'
-            : 'Permiso para acceder a contactos denegado.'}
-        </Text>
-      )}
+        data={contacts}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+      />
       <Button title="Cargar Contactos" onPress={loadContacts} />
     </View>
   );
@@ -71,14 +88,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
   },
-  noNumber: {
-    fontSize: 16,
-    color: '#888',
-  },
-  permissionText: {
-    fontSize: 16,
+  emergencyNumber: {
     color: 'red',
-    marginBottom: 16,
+    fontWeight: 'bold',
   },
 });
 

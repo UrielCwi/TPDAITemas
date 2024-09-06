@@ -3,40 +3,40 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
 const EmergencyNumberScreen = () => {
-  const [emergencyNumber, setEmergencyNumber] = useState('');
+  const [emergencyNumbers, setEmergencyNumbers] = useState([]);
+  const [inputNumber, setInputNumber] = useState('');
 
   useEffect(() => {
-    const fetchEmergencyNumber = async () => {
+    const fetchEmergencyNumbers = async () => {
       try {
-        const storedNumber = await SecureStore.getItemAsync('emergencyNumber');
-        if (storedNumber) {
-          setEmergencyNumber(storedNumber);
+        const storedNumbers = await SecureStore.getItemAsync('emergencyNumbers');
+        if (storedNumbers) {
+          setEmergencyNumbers(JSON.parse(storedNumbers));
         }
       } catch (error) {
-        console.error('Error fetching emergency number:', error);
+        console.error('Error fetching emergency numbers:', error);
       }
     };
 
-    fetchEmergencyNumber();
+    fetchEmergencyNumbers();
   }, []);
 
   const saveEmergencyNumber = async () => {
-    if (validatePhoneNumber(emergencyNumber)) {
-      try {
-        await SecureStore.setItemAsync('emergencyNumber', emergencyNumber);
-        Alert.alert('Número de emergencia guardado', `El número ${emergencyNumber} ha sido guardado.`);
-      } catch (error) {
-        console.error('Error saving emergency number:', error);
-        Alert.alert('Error', 'No se pudo guardar el número de emergencia.');
-      }
-    } else {
-      Alert.alert('Número inválido', 'Por favor ingrese un número de teléfono válido.');
+    const formattedNumber = formatPhoneNumber(inputNumber);
+    const updatedNumbers = [...emergencyNumbers, formattedNumber];
+    try {
+      await SecureStore.setItemAsync('emergencyNumbers', JSON.stringify(updatedNumbers));
+      setEmergencyNumbers(updatedNumbers);
+      setInputNumber('');
+      Alert.alert('Número de emergencia guardado', `El número ${formattedNumber} ha sido guardado.`);
+    } catch (error) {
+      console.error('Error saving emergency number:', error);
+      Alert.alert('Error', 'No se pudo guardar el número de emergencia.');
     }
   };
 
-  const validatePhoneNumber = (number) => {
-    const phoneRegex = /^\+54 9 \d{2} \d{4} \d{4}$/;
-    return phoneRegex.test(number);
+  const formatPhoneNumber = (number) => {
+    return number.replace(/\D/g, '');
   };
 
   return (
@@ -46,8 +46,8 @@ const EmergencyNumberScreen = () => {
         style={styles.input}
         placeholder="Ingrese el número de teléfono"
         keyboardType="phone-pad"
-        value={emergencyNumber}
-        onChangeText={setEmergencyNumber}
+        value={inputNumber}
+        onChangeText={setInputNumber}
       />
       <Button title="Guardar Número" onPress={saveEmergencyNumber} />
     </View>
@@ -72,6 +72,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingHorizontal: 8,
     marginBottom: 16,
+  },
+  numberList: {
+    marginTop: 16,
+  },
+  numberItem: {
+    fontSize: 16,
+    color: '#333',
   },
 });
 
