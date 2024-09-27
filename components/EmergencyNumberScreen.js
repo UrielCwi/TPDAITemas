@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { showError } from '../components/errorHelper.js';  // Importar el helper
+import { Alert } from 'react-native';
 
 const EmergencyNumberScreen = () => {
   const [emergencyNumbers, setEmergencyNumbers] = useState([]);
@@ -29,6 +30,7 @@ const EmergencyNumberScreen = () => {
       await SecureStore.setItemAsync('emergencyNumbers', JSON.stringify(updatedNumbers));
       setEmergencyNumbers(updatedNumbers);
       setInputNumber('');
+      console.log(updatedNumbers)
       Alert.alert('Número de emergencia guardado', `El número ${formattedNumber} ha sido guardado.`);
     } catch (error) {
       showError('Error saving emergency number.');
