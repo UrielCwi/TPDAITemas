@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Modal, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import QRCode from 'react-native-qrcode-svg';
+import { showError } from '../helpers/errorHelper';  // Importar el helper
 
 const AboutScreen = () => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -14,6 +15,9 @@ const AboutScreen = () => {
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
+      if (status !== 'granted') {
+        showError('No se tienen permisos para acceder a la cámara.');
+      }
       setHasPermission(status === 'granted');
     })();
   }, []);

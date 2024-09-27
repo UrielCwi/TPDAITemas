@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import * as SecureStore from 'expo-secure-store';
+import { showError } from '../helpers/errorHelper'; 
 
 const ContactListScreen = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);
@@ -18,7 +19,7 @@ const ContactListScreen = ({ navigation }) => {
         setEmergencyNumbers(JSON.parse(storedNumbers));
       }
     } catch (error) {
-      console.error('Error fetching emergency numbers:', error);
+      showError('Error fetching emergency numbers');
     }
   };
 
@@ -30,10 +31,10 @@ const ContactListScreen = ({ navigation }) => {
         setContacts(data);
         fetchEmergencyNumbers(); // Refresh emergency numbers when contacts are loaded
       } else {
-        Alert.alert('No Contacts Found', 'No contacts were found on this device.');
+        showError('No contacts found on this device.');
       }
     } else {
-      Alert.alert('Permission Denied', 'We need permission to access your contacts.');
+      showError('Permission denied to access contacts.');
     }
   };
 
