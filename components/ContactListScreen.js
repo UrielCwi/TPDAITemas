@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
 import * as Contacts from 'expo-contacts';
 import * as SecureStore from 'expo-secure-store';
-import { showError } from '../helpers/errorHelper'; 
+import { showError } from '../components/errorHelper.js'; 
 
 const ContactListScreen = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);

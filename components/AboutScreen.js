@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, Modal, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import QRCode from 'react-native-qrcode-svg';
-import { showError } from '../helpers/errorHelper';  // Importar el helper
+import { showError } from '../components/errorHelper';  // Importar el helper
 
 const AboutScreen = () => {
   const [hasPermission, setHasPermission] = useState(null);

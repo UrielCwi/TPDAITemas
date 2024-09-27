@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
-import { showError } from '../helpers/errorHelper';  // Importar el helper
+import { showError } from '../components/errorHelper';  
 
 const WeatherScreen = () => {
   const [location, setLocation] = useState(null);
@@ -10,7 +10,6 @@ const WeatherScreen = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Obtener la ubicación del dispositivo
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -22,8 +21,6 @@ const WeatherScreen = () => {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
-
-      // Actualizar la hora cada segundo
       const timer = setInterval(() => {
         setCurrentTime(new Date());
       }, 1000);
@@ -32,7 +29,6 @@ const WeatherScreen = () => {
     })();
   }, []);
 
-  // Obtener el clima utilizando la API de OpenWeatherMap
   useEffect(() => {
     if (location) {
       const { latitude, longitude } = location.coords;

@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native';
 import ContactListScreen from '../components/ContactListScreen';
 import EmergencyNumberScreen from '../components/EmergencyNumberScreen';
 import AboutScreen from '../components/AboutScreen';  // Asegúrate de que la ruta sea correcta
+import WeatherScreen from '../components/WeatherScreen';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -17,9 +18,10 @@ const AppNavigator = () => {
           tabBarLabelStyle: styles.tabBarLabel,
         }}
       >
-        <Tab.Screen name="Contactos" component={ContactListScreen} />
-        <Tab.Screen name="Emergencia" component={EmergencyNumberScreen} />
-        <Tab.Screen name="About" component={AboutScreen} />  
+        <Tab.Screen name="Contacts" component={ContactListScreen} />
+        <Tab.Screen name="Emergency" component={EmergencyNumberScreen} />
+        <Tab.Screen name="About" component={AboutScreen} /> 
+        <Tab.Screen name="Weather" component={WeatherScreen} />  
       </Tab.Navigator>
     </NavigationContainer>
   );

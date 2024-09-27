@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { showError } from '../helpers/errorHelper';  // Importar el helper
+import { showError } from '../components/errorHelper.js';  // Importar el helper
 
 const EmergencyNumberScreen = () => {
   const [emergencyNumbers, setEmergencyNumbers] = useState([]);
